@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { FaWindowClose} from 'react-icons/fa'
 import { collection, addDoc } from "firebase/firestore";
 import { db } from '../firebase/config'
@@ -6,16 +6,17 @@ import { db } from '../firebase/config'
 //context
 import { AuthContext } from "../firebase/auth/AuthContext";
 
-function Modal({ showModal, onClose }) {
+function Modal({ showModal, onClose, addTaskItem }) {
   const [task, setTask] = useState('');
   const [date, setDate] = useState('');
 
   //user 
-  const user = useContext(AuthContext)
+  const user = useContext(AuthContext);
 
   const handleInputChange = (event) => {
     setTask(event.target.value);
   };
+
   const handleDate = (event) => {
     setDate(event.target.value);
   };
@@ -25,12 +26,16 @@ function Modal({ showModal, onClose }) {
       const docRef = await addDoc(collection(db, "tasks"), {
         task,
         date,
-        scheduled: false,
-        inProgress: false,
-        review: false,
-        completed: false,
-        createdBy: user.uid
+        category: {
+          scheduled: true,
+          inProgress: false,
+          reviewed: false,
+          completed: false,
+        },
+        createdBy: user.uid,
+        author: user.displayName
       });
+      addTaskItem(docRef)
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);

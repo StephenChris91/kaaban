@@ -12,6 +12,7 @@ import { AuthContext } from "../firebase/auth/AuthContext";
 const Dasboard = () => {
 
     const [showModal, setShowModal ] = useState(false)
+    const [items, setItems] = useState([])
 
     const user = useContext(AuthContext)
 
@@ -26,6 +27,10 @@ const Dasboard = () => {
       const handleSignOut = () => {
         auth.signOut();
     };
+
+    const addTaskItem = (item) => {
+      setItems((prevItems) => [...prevItems, item] )
+    }
     return ( 
         <>
         <Layout>
@@ -34,7 +39,7 @@ const Dasboard = () => {
               <Sidebar />
             </div>
             <div className='w-screen p-2 mb-5'>
-              <Modal showModal={showModal} onClose={handleCloseModal}/>
+              <Modal showModal={showModal} onClose={handleCloseModal} addTaskItem={addTaskItem}/>
               <div className='flex justify-between w-full items mb-10'>
                 <button className='p-3 rounded-sm w-40 bg-slate-900 text-white' onClick={handleOpenModal}>Create</button>
                 <button className='p-3 rounded-sm w-40 bg-slate-900 text-white' onClick={handleSignOut}>Log Out</button>
