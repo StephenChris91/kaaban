@@ -1,18 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { FaWindowClose} from 'react-icons/fa'
+import { collection, addDoc } from "firebase/firestore";
+import { db } from '../firebase/config'
+
+//context
+import { AuthContext } from "../firebase/auth/AuthContext";
 
 function Modal({ showModal, onClose }) {
-  const [inputValue, setInputValue] = useState('');
+  const [task, setTask] = useState('');
   const [date, setDate] = useState('');
 
+  //user 
+  const user = useContext(AuthContext)
+
   const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+    setTask(event.target.value);
   };
   const handleDate = (event) => {
     setDate(event.target.value);
   };
 
-  const handleSave = () => {
-    console.log(`Save input value: ${inputValue}`);
+  const handleSave = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "tasks"), {
+        task,
+        date,
+        scheduled: false,
+        inProgress: false,
+        review: false,
+        completed: false,
+        createdBy: user.uid
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
     onClose();
   };
 
@@ -23,11 +45,11 @@ function Modal({ showModal, onClose }) {
         <div className="rounded-md w-96 p-20 bg-white relative">
           <div className="modal-content">
             <h2 className='text-lg font-bold text-slate-900 absolute top-6 left-3'>Create Board</h2>
-            <input className='w-full mb-2' type="text" value={inputValue} onChange={handleInputChange} placeholder='Enter a value'/>
+            <input className='w-full mb-2' type="text" value={task} onChange={handleInputChange} placeholder='Enter a value'/>
             <input className='w-full mb-2' type="date" value={date} onChange={handleDate} />
             <div className="modal-buttons">
               <button className='bg-slate-900 text-white p-3 rounded-sm w-56' onClick={handleSave}>Save</button>
-              <button className='absolute top-2 right-2' onClick={onClose}>Close</button>
+              <FaWindowClose className='text-lg text-red-700 absolute top-2 right-2 pointer' onClick={onClose}/>
             </div>
           </div>
         </div>
