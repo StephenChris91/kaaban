@@ -39,6 +39,7 @@ const Dasboard = () => {
   
     const handleSingleAddItem = async (item) => {
       await addBoardItem(item);
+      handleCloseModal()
     };
     return ( 
         <>

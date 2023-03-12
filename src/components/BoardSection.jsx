@@ -4,11 +4,15 @@ import { Card, Button } from 'flowbite-react';
 import Modal from './modal';
 
 
+//icon
+import { FaTrash } from 'react-icons/fa';
+
+
 
 //context
 
 
-const BoardSection = ( { title, boardItems, showModal } ) => {
+const BoardSection = ( { title, boardItems, deleteItem } ) => {
     const [selectedBoardItem, setSelectedBoardItem] = useState(null);
     const [showModalUpdate, setShowModalUpdate ] = useState(false)
 
@@ -22,7 +26,7 @@ const BoardSection = ( { title, boardItems, showModal } ) => {
     const handleCloseModal = () => {
       setShowModalUpdate(false);
     };
-    
+
     
     return ( 
         <>
@@ -32,6 +36,7 @@ const BoardSection = ( { title, boardItems, showModal } ) => {
                 {!boardItems ? <p>No items found</p> : boardItems.map(item => (
                   <div key={item.id}>
                     <Card className='mb-2'>
+                      <FaTrash  className='text-red-700 cursor-pointer' onClick={() => deleteItem(item.id)}/>
                       <h5 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                         {item.task}
                       </h5>

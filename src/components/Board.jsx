@@ -1,6 +1,6 @@
 import BoardSection from "./BoardSection";
 import {useState, useEffect, useContext} from 'react'
-import { collection, addDoc, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { collection, deleteDoc, query, where, doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase/config'
 
 
@@ -11,16 +11,6 @@ const Board = () => {
 
     const [taskType, setTaskType] = useState([])
     const user = useContext(AuthContext);
-
-
-    // useEffect(() => {
-    //   const unsubscribe = onSnapshot(collection(db, 'tasks'), (snapshot) => {
-    //     const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    //     setTaskType(items);
-    //     console.log(taskType)
-    //   });
-    //   return () => unsubscribe();
-    // }, []);
 
     useEffect(() => {
       const q = query(collection(db, "tasks"), where("createdBy", "==", user.uid));
@@ -33,14 +23,22 @@ const Board = () => {
       };
     }, [user]);
 
-    
+    const handleDeleteItem = async (itemId) => {
+      try {
+        await deleteDoc(doc(db, "tasks", itemId));
+        setTaskType(prevItems => prevItems.filter(item => item.id !== itemId));
+      } catch (error) {
+        console.error("Error deleting document: ", error);
+      }
+    };
+
     return ( 
         <>
             <div className="grid grid-cols-4 gap-4">
-                <BoardSection title="Scheduled" boardItems={taskType.filter(item => item.category.scheduled)} />
-                <BoardSection title="In Progress" boardItems={taskType.filter(item => item.category.inProgress)} />
-                <BoardSection title="Review" boardItems={taskType.filter(item => item.category.review)} />
-                <BoardSection title="Completed" boardItems={taskType.filter(item => item.category.completed)} />
+                <BoardSection title="Scheduled" boardItems={taskType.filter(item => item.category.scheduled)} deleteItem={handleDeleteItem}/>
+                <BoardSection title="In Progress" boardItems={taskType.filter(item => item.category.inProgress)} deleteItem={handleDeleteItem}/>
+                <BoardSection title="Review" boardItems={taskType.filter(item => item.category.review)} deleteItem={handleDeleteItem}/>
+                <BoardSection title="Completed" boardItems={taskType.filter(item => item.category.completed)} deleteItem={handleDeleteItem}/>
             </div>
 
         </>
