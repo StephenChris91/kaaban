@@ -2,8 +2,9 @@ import { useState } from 'react';
 import Layout from "../components/Layout";
 import Modal from '../components/modal';
 import Sidebar from "../components/Sidebar";
-import { auth } from '../firebase/config'
+import { auth, db } from '../firebase/config'
 import Board from '../components/Board';
+import { addDoc, collection } from 'firebase/firestore';
 
 //context
 import { useContext } from "react";
@@ -28,9 +29,17 @@ const Dasboard = () => {
         auth.signOut();
     };
 
-    const addTaskItem = (item) => {
-      setItems((prevItems) => [...prevItems, item] )
-    }
+    const addBoardItem = async (item) => {
+      try {
+        await addDoc(collection(db, "tasks"), item);
+      } catch (error) {
+        console.error("Error adding board item: ", error);
+      }
+    };
+  
+    const handleSingleAddItem = async (item) => {
+      await addBoardItem(item);
+    };
     return ( 
         <>
         <Layout>
@@ -39,7 +48,7 @@ const Dasboard = () => {
               <Sidebar />
             </div>
             <div className='w-screen p-2 mb-5'>
-              <Modal showModal={showModal} onClose={handleCloseModal} addTaskItem={addTaskItem}/>
+              <Modal showModal={showModal} onClose={handleCloseModal} addTaskItem={handleSingleAddItem}/>
               <div className='flex justify-between w-full items mb-10'>
                 <button className='p-3 rounded-sm w-40 bg-slate-900 text-white' onClick={handleOpenModal}>Create</button>
                 <button className='p-3 rounded-sm w-40 bg-slate-900 text-white' onClick={handleSignOut}>Log Out</button>

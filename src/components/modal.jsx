@@ -1,60 +1,86 @@
 import { useState, useContext } from 'react';
 import { FaWindowClose} from 'react-icons/fa'
-import { collection, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, setDoc, getDocs } from "firebase/firestore";
 import { db } from '../firebase/config'
 
 //context
 import { AuthContext } from "../firebase/auth/AuthContext";
 
-function Modal({ showModal, onClose, addTaskItem }) {
+function Modal( { showModal, onClose, addTaskItem } ) {
   const [task, setTask] = useState('');
   const [date, setDate] = useState('');
+  const [category, setCategory] = useState('');
 
   //user 
   const user = useContext(AuthContext);
 
-  const handleInputChange = (event) => {
-    setTask(event.target.value);
+  const handleInputChange = (e) => {
+    setTask(e.target.value);
   };
 
-  const handleDate = (event) => {
-    setDate(event.target.value);
+  const handleCategoryChange = (event) => {
+    const value = event.target.value;
+    setCategory(value);
   };
 
-  const handleSave = async () => {
+  const handleDate = (e) => {
+    setDate(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     try {
-      const docRef = await addDoc(collection(db, "tasks"), {
+      const newItem = {
         task,
         date,
         category: {
-          scheduled: true,
-          inProgress: false,
-          reviewed: false,
-          completed: false,
+          scheduled: category === 'scheduled' ? true : false,
+          inProgress: category === 'inProgress' ? true : false,
+          review: category === 'review' ? true : false,
+          completed: category === 'completed' ? true : false,
         },
         createdBy: user.uid,
         author: user.displayName
-      });
-      addTaskItem(docRef)
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
+      };
+      
+      const docRef = await addDoc(collection(db, "tasks"), newItem);
+      const newId = docRef.id;
+  
+      // Update board items immediately
+      addTaskItem(prevItems => [...prevItems, { id: newId, ...newItem }]);
+  
+      // ... reset state
+      setTask('');
+      setDate('');
+      setCategory('');
+    } catch (err) {
+      console.error(err);
     }
-    onClose();
   };
+  
 
   return (
     <>
       {showModal ? (
         <div className='modal-overlay flex justify-center items-center fixed top-0 left-0 w-screen h-screen'>   
-        <div className="rounded-md w-96 p-20 bg-white relative">
+        <div className="rounded-md w-96 p-20 bg-white relative z-50">
           <div className="modal-content">
             <h2 className='text-lg font-bold text-slate-900 absolute top-6 left-3'>Create Board</h2>
             <input className='w-full mb-2' type="text" value={task} onChange={handleInputChange} placeholder='Enter a value'/>
             <input className='w-full mb-2' type="date" value={date} onChange={handleDate} />
+            <div className='w-full mb-2'>
+            <select className='w-full mb-2' value={category} onChange={handleCategoryChange}>
+              <option value="" disabled>Select category</option>
+              <option value="scheduled">Schedule</option>
+              <option value="inProgress">In Progress</option>
+              <option value="review">Review</option>
+              <option value="completed">Completed</option>
+            </select>
+            </div>
             <div className="modal-buttons">
-              <button className='bg-slate-900 text-white p-3 rounded-sm w-56' onClick={handleSave}>Save</button>
-              <FaWindowClose className='text-lg text-red-700 absolute top-2 right-2 pointer' onClick={onClose}/>
+              <button className='bg-slate-900 text-white p-3 rounded-sm w-56' onClick={handleSubmit}>Save</button>
+              <FaWindowClose className='text-lg text-red-700 absolute top-2 right-2 cursor-pointer' onClick={onClose}/>
             </div>
           </div>
         </div>
