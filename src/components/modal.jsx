@@ -1,15 +1,16 @@
 import { useState, useContext } from 'react';
 import { FaWindowClose} from 'react-icons/fa'
-import { collection, onSnapshot, addDoc, setDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from '../firebase/config'
 
 //context
 import { AuthContext } from "../firebase/auth/AuthContext";
 
-function Modal( { showModal, onClose, addTaskItem } ) {
+function Modal( { showModal, onClose, addTaskItem, updateTaskItem } ) {
   const [task, setTask] = useState('');
   const [date, setDate] = useState('');
   const [category, setCategory] = useState('');
+  const [updateItem, setUpdateItem] = useState(nulls)
 
   //user 
   const user = useContext(AuthContext);
@@ -27,8 +28,14 @@ function Modal( { showModal, onClose, addTaskItem } ) {
     setDate(e.target.value);
   };
 
+  const updateTask = () => {
+    updateTaskItem(task.id)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    //console.log(updateTaskItem)
     
     try {
       const newItem = {
@@ -63,8 +70,8 @@ function Modal( { showModal, onClose, addTaskItem } ) {
   return (
     <>
       {showModal ? (
-        <div className='modal-overlay flex justify-center items-center fixed top-0 left-0 w-screen h-screen'>   
-        <div className="rounded-md w-96 p-20 bg-white relative z-50">
+        <div className='modal-overlay flex justify-center items-center fixed top-0 left-0 w-screen h-screen z-50'>   
+        <div className="rounded-md w-96 p-20 bg-white relative">
           <div className="modal-content">
             <h2 className='text-lg font-bold text-slate-900 absolute top-6 left-3'>Create Board</h2>
             <input className='w-full mb-2' type="text" value={task} onChange={handleInputChange} placeholder='Enter a value'/>
