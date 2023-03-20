@@ -33,26 +33,26 @@ const Board = () => {
       }
     };
 
-    const getSingleDoc = (id) => {
-      const docRef = doc(db, 'tasks', id);
-      const docSnap = getDoc(docRef);
+    // const getSingleDoc = (id) => {
+    //   const docRef = doc(db, 'tasks', id);
+    //   const docSnap = getDoc(docRef);
 
-      if (docSnap.exists()) {
-        setEditData(docSnap.data())
-        console.log(editData)
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    }
+    //   if (docSnap.exists()) {
+    //     setEditData(docSnap.data())
+    //     console.log(editData)
+    //   } else {
+    //     // doc.data() will be undefined in this case
+    //     console.log("No such document!");
+    //   }
+    // }
 
     return ( 
         <>
             <div className="grid grid-cols-4 gap-4">
-                <BoardSection title="Scheduled" boardItems={taskType.filter(item => item.category.scheduled)} deleteItem={handleDeleteItem} singleDoc={getSingleDoc}/>
-                <BoardSection title="In Progress" boardItems={taskType.filter(item => item.category.inProgress)} deleteItem={handleDeleteItem} singleDoc={getSingleDoc}/>
-                <BoardSection title="Review" boardItems={taskType.filter(item => item.category.review)} deleteItem={handleDeleteItem} singleDoc={getSingleDoc}/>
-                <BoardSection title="Completed" boardItems={taskType.filter(item => item.category.completed)} deleteItem={handleDeleteItem} singleDoc={getSingleDoc}/>
+                <BoardSection title="Scheduled" boardItems={taskType.filter(item => item.category.scheduled)} deleteItem={handleDeleteItem} />
+                <BoardSection title="In Progress" boardItems={taskType.filter(item => item.category.inProgress)} deleteItem={handleDeleteItem} />
+                <BoardSection title="Review" boardItems={taskType.filter(item => item.category.review)} deleteItem={handleDeleteItem} />
+                <BoardSection title="Completed" boardItems={taskType.filter(item => item.category.completed)} deleteItem={handleDeleteItem} />
             </div>
 
         </>

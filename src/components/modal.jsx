@@ -10,7 +10,7 @@ function Modal( { showModal, onClose, addTaskItem, updateTaskItem } ) {
   const [task, setTask] = useState('');
   const [date, setDate] = useState('');
   const [category, setCategory] = useState('');
-  const [updateItem, setUpdateItem] = useState(nulls)
+  const [updateItem, setUpdateItem] = useState(null)
 
   //user 
   const user = useContext(AuthContext);
