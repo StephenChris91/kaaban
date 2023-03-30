@@ -2,13 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
-
-      //only authenticated uers can create boards
-      allow create: if request.auth != null;
-
-
-      //users can only read and delete their own boards
-      allow read, delete: if request.auth.uid == resource.data.uid;
+      allow read, write: if request.auth != null;
     }
   }
 }
